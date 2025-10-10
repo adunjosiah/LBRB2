@@ -1,0 +1,828 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/L.Control.Layers.Tree.css">
+        <link rel="stylesheet" href="css/L.Control.Locate.min.css">
+        <link rel="stylesheet" href="css/qgis2web.css">
+        <link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <link rel="stylesheet" href="css/leaflet.photon.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/L.Control.Layers.Tree.min.js"></script>
+        <script src="js/L.Control.Locate.min.js"></script>
+        <script src="js/leaflet-svg-shape-markers.min.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="js/leaflet.photon.js"></script>
+        <script src="data/BarracksBusstop_3.js"></script>
+        <script src="data/LASUBusStop_4.js"></script>
+        <script src="data/LBEStops_5.js"></script>
+        <script src="data/Okokomaiko_6.js"></script>
+        <script src="data/AbuleEgbaOshodiStops_7.js"></script>
+        <script src="data/IkoroduTBSStops_8.js"></script>
+        <script src="data/BlueLine_9.js"></script>
+        <script src="data/RedLine_10.js"></script>
+        <script src="data/BlueLineStations_11.js"></script>
+        <script src="data/RedLineStations_12.js"></script>
+        <script>
+        var highlightLayer;
+        function highlightFeature(e) {
+            highlightLayer = e.target;
+
+            if (e.target.feature.geometry.type === 'LineString' || e.target.feature.geometry.type === 'MultiLineString') {
+              highlightLayer.setStyle({
+                color: '#ffff00',
+              });
+            } else {
+              highlightLayer.setStyle({
+                fillColor: '#ffff00',
+                fillOpacity: 1
+              });
+            }
+        }
+        var map = L.map('map', {
+            zoomControl:false, maxZoom:28, minZoom:1
+        }).fitBounds([[6.25220775282191,2.998737624860882],[6.77656267862235,3.737119818784322]]);
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        // remove popup's row if "visible-with-data"
+        function removeEmptyRowsFromPopupContent(content, feature) {
+         var tempDiv = document.createElement('div');
+         tempDiv.innerHTML = content;
+         var rows = tempDiv.querySelectorAll('tr');
+         for (var i = 0; i < rows.length; i++) {
+             var td = rows[i].querySelector('td.visible-with-data');
+             var key = td ? td.id : '';
+             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                 rows[i].parentNode.removeChild(rows[i]);
+             }
+         }
+         return tempDiv.innerHTML;
+        }
+        // add class to format popup if it contains media
+		function addClassToPopupIfMedia(content, popup) {
+			var tempDiv = document.createElement('div');
+			tempDiv.innerHTML = content;
+			if (tempDiv.querySelector('td img')) {
+				popup._contentNode.classList.add('media');
+					// Delay to force the redraw
+					setTimeout(function() {
+						popup.update();
+					}, 10);
+			} else {
+				popup._contentNode.classList.remove('media');
+			}
+		}
+        var zoomControl = L.control.zoom({
+            position: 'topleft'
+        }).addTo(map);
+        L.control.locate({locateOptions: {maxZoom: 19}}).addTo(map);
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+        }
+        map.createPane('pane_GoogleSatellite_0');
+        map.getPane('pane_GoogleSatellite_0').style.zIndex = 400;
+        var layer_GoogleSatellite_0 = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+            pane: 'pane_GoogleSatellite_0',
+            opacity: 1.0,
+            attribution: '<a href="https://www.google.at/permissions/geoguidelines/attr-guide.html">Map data ©2015 Google</a>',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 20
+        });
+        layer_GoogleSatellite_0;
+        map.addLayer(layer_GoogleSatellite_0);
+        map.createPane('pane_GoogleHybrid_1');
+        map.getPane('pane_GoogleHybrid_1').style.zIndex = 401;
+        var layer_GoogleHybrid_1 = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+            pane: 'pane_GoogleHybrid_1',
+            opacity: 1.0,
+            attribution: '<a href="https://www.google.at/permissions/geoguidelines/attr-guide.html">Map data ©2015 Google</a>',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 20
+        });
+        layer_GoogleHybrid_1;
+        map.addLayer(layer_GoogleHybrid_1);
+        map.createPane('pane_GoogleRoad_2');
+        map.getPane('pane_GoogleRoad_2').style.zIndex = 402;
+        var layer_GoogleRoad_2 = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+            pane: 'pane_GoogleRoad_2',
+            opacity: 1.0,
+            attribution: '<a href="https://www.google.at/permissions/geoguidelines/attr-guide.html">Map data ©2015 Google</a>',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 20
+        });
+        layer_GoogleRoad_2;
+        map.addLayer(layer_GoogleRoad_2);
+        function pop_BarracksBusstop_3(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (var i in e.target._eventParents) {
+                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                            e.target._eventParents[i].resetStyle(e.target);
+                        }
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row" style="padding-right: 10px;">Bus stop Name</th>\
+                        <td class="visible-with-data" id="Name">' + (feature.properties['Name'] !== null ? autolinker.link(String(feature.properties['Name']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_BarracksBusstop_3_0() {
+            return {
+                pane: 'pane_BarracksBusstop_3',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/BarracksBusstop_3.svg',
+            iconSize: [30.4, 30.4]
+        }),
+                interactive: true,
+            }
+        }
+        map.createPane('pane_BarracksBusstop_3');
+        map.getPane('pane_BarracksBusstop_3').style.zIndex = 403;
+        map.getPane('pane_BarracksBusstop_3').style['mix-blend-mode'] = 'normal';
+        var layer_BarracksBusstop_3 = new L.geoJson(json_BarracksBusstop_3, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_BarracksBusstop_3',
+            layerName: 'layer_BarracksBusstop_3',
+            pane: 'pane_BarracksBusstop_3',
+            onEachFeature: pop_BarracksBusstop_3,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_BarracksBusstop_3_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_BarracksBusstop_3);
+        map.addLayer(layer_BarracksBusstop_3);
+        function pop_LASUBusStop_4(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (var i in e.target._eventParents) {
+                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                            e.target._eventParents[i].resetStyle(e.target);
+                        }
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row" style="padding-right: 10px;">Bus stop Name</th>\
+                        <td class="visible-with-data" id="Name">' + (feature.properties['Name'] !== null ? autolinker.link(String(feature.properties['Name']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_LASUBusStop_4_0() {
+            return {
+                pane: 'pane_LASUBusStop_4',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/LASUBusStop_4.svg',
+            iconSize: [30.4, 30.4]
+        }),
+                interactive: true,
+            }
+        }
+        map.createPane('pane_LASUBusStop_4');
+        map.getPane('pane_LASUBusStop_4').style.zIndex = 404;
+        map.getPane('pane_LASUBusStop_4').style['mix-blend-mode'] = 'normal';
+        var layer_LASUBusStop_4 = new L.geoJson(json_LASUBusStop_4, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_LASUBusStop_4',
+            layerName: 'layer_LASUBusStop_4',
+            pane: 'pane_LASUBusStop_4',
+            onEachFeature: pop_LASUBusStop_4,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_LASUBusStop_4_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_LASUBusStop_4);
+        map.addLayer(layer_LASUBusStop_4);
+        function pop_LBEStops_5(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (var i in e.target._eventParents) {
+                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                            e.target._eventParents[i].resetStyle(e.target);
+                        }
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">ID</th>\
+                        <td class="visible-with-data" id="ID">' + (feature.properties['ID'] !== null ? autolinker.link(String(feature.properties['ID']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">SN</th>\
+                        <td class="visible-with-data" id="SN">' + (feature.properties['SN'] !== null ? autolinker.link(String(feature.properties['SN']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">LIST_OF_BU</th>\
+                        <td class="visible-with-data" id="LIST_OF_BU">' + (feature.properties['LIST_OF_BU'] !== null ? autolinker.link(String(feature.properties['LIST_OF_BU']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">DIRECTIONP</th>\
+                        <td class="visible-with-data" id="DIRECTIONP">' + (feature.properties['DIRECTIONP'] !== null ? autolinker.link(String(feature.properties['DIRECTIONP']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">GPS_WAY_PO</th>\
+                        <td class="visible-with-data" id="GPS_WAY_PO">' + (feature.properties['GPS_WAY_PO'] !== null ? autolinker.link(String(feature.properties['GPS_WAY_PO']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">X_COORDINA</th>\
+                        <td class="visible-with-data" id="X_COORDINA">' + (feature.properties['X_COORDINA'] !== null ? autolinker.link(String(feature.properties['X_COORDINA']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Y_COORDINA</th>\
+                        <td class="visible-with-data" id="Y_COORDINA">' + (feature.properties['Y_COORDINA'] !== null ? autolinker.link(String(feature.properties['Y_COORDINA']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_LBEStops_5_0() {
+            return {
+                pane: 'pane_LBEStops_5',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/LBEStops_5.svg',
+            iconSize: [30.4, 30.4]
+        }),
+                interactive: false,
+            }
+        }
+        map.createPane('pane_LBEStops_5');
+        map.getPane('pane_LBEStops_5').style.zIndex = 405;
+        map.getPane('pane_LBEStops_5').style['mix-blend-mode'] = 'normal';
+        var layer_LBEStops_5 = new L.geoJson(json_LBEStops_5, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_LBEStops_5',
+            layerName: 'layer_LBEStops_5',
+            pane: 'pane_LBEStops_5',
+            onEachFeature: pop_LBEStops_5,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_LBEStops_5_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_LBEStops_5);
+        map.addLayer(layer_LBEStops_5);
+        function pop_Okokomaiko_6(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (var i in e.target._eventParents) {
+                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                            e.target._eventParents[i].resetStyle(e.target);
+                        }
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row" style="padding-right: 10px;">Bus stop name</th>\
+                        <td class="visible-with-data" id="Name">' + (feature.properties['Name'] !== null ? autolinker.link(String(feature.properties['Name']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_Okokomaiko_6_0() {
+            return {
+                pane: 'pane_Okokomaiko_6',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/Okokomaiko_6.svg',
+            iconSize: [30.4, 30.4]
+        }),
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Okokomaiko_6');
+        map.getPane('pane_Okokomaiko_6').style.zIndex = 406;
+        map.getPane('pane_Okokomaiko_6').style['mix-blend-mode'] = 'normal';
+        var layer_Okokomaiko_6 = new L.geoJson(json_Okokomaiko_6, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Okokomaiko_6',
+            layerName: 'layer_Okokomaiko_6',
+            pane: 'pane_Okokomaiko_6',
+            onEachFeature: pop_Okokomaiko_6,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_Okokomaiko_6_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_Okokomaiko_6);
+        map.addLayer(layer_Okokomaiko_6);
+        function pop_AbuleEgbaOshodiStops_7(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (var i in e.target._eventParents) {
+                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                            e.target._eventParents[i].resetStyle(e.target);
+                        }
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row" style="padding-right: 10px;">Bus stop name</th>\
+                        <td class="visible-with-data" id="Names">' + (feature.properties['Names'] !== null ? autolinker.link(String(feature.properties['Names']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_AbuleEgbaOshodiStops_7_0() {
+            return {
+                pane: 'pane_AbuleEgbaOshodiStops_7',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/AbuleEgbaOshodiStops_7.svg',
+            iconSize: [30.4, 30.4]
+        }),
+                interactive: true,
+            }
+        }
+        map.createPane('pane_AbuleEgbaOshodiStops_7');
+        map.getPane('pane_AbuleEgbaOshodiStops_7').style.zIndex = 407;
+        map.getPane('pane_AbuleEgbaOshodiStops_7').style['mix-blend-mode'] = 'normal';
+        var layer_AbuleEgbaOshodiStops_7 = new L.geoJson(json_AbuleEgbaOshodiStops_7, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_AbuleEgbaOshodiStops_7',
+            layerName: 'layer_AbuleEgbaOshodiStops_7',
+            pane: 'pane_AbuleEgbaOshodiStops_7',
+            onEachFeature: pop_AbuleEgbaOshodiStops_7,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_AbuleEgbaOshodiStops_7_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_AbuleEgbaOshodiStops_7);
+        map.addLayer(layer_AbuleEgbaOshodiStops_7);
+        function pop_IkoroduTBSStops_8(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (var i in e.target._eventParents) {
+                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                            e.target._eventParents[i].resetStyle(e.target);
+                        }
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row" style="padding-right: 10px;">Bus stop name</th>\
+                        <td class="visible-with-data" id="Name">' + (feature.properties['Name'] !== null ? autolinker.link(String(feature.properties['Name']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_IkoroduTBSStops_8_0() {
+            return {
+                pane: 'pane_IkoroduTBSStops_8',
+        rotationAngle: 0.0,
+        rotationOrigin: 'center center',
+        icon: L.icon({
+            iconUrl: 'markers/IkoroduTBSStops_8.svg',
+            iconSize: [30.4, 30.4]
+        }),
+                interactive: true,
+            }
+        }
+        map.createPane('pane_IkoroduTBSStops_8');
+        map.getPane('pane_IkoroduTBSStops_8').style.zIndex = 408;
+        map.getPane('pane_IkoroduTBSStops_8').style['mix-blend-mode'] = 'normal';
+        var layer_IkoroduTBSStops_8 = new L.geoJson(json_IkoroduTBSStops_8, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_IkoroduTBSStops_8',
+            layerName: 'layer_IkoroduTBSStops_8',
+            pane: 'pane_IkoroduTBSStops_8',
+            onEachFeature: pop_IkoroduTBSStops_8,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.marker(latlng, style_IkoroduTBSStops_8_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_IkoroduTBSStops_8);
+        map.addLayer(layer_IkoroduTBSStops_8);
+        function pop_BlueLine_9(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (var i in e.target._eventParents) {
+                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                            e.target._eventParents[i].resetStyle(e.target);
+                        }
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row" style="padding-right: 20px;">Bus stop name</th>\
+                        <td class="visible-with-data" id="Name">' + (feature.properties['Name'] !== null ? autolinker.link(String(feature.properties['Name']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Length</th>\
+                        <td class="visible-with-data" id="Length">' + (feature.properties['Length'] !== null ? autolinker.link(String(feature.properties['Length']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_BlueLine_9_0() {
+            return {
+                pane: 'pane_BlueLine_9',
+                opacity: 1,
+                color: 'rgba(0,0,255,1.0)',
+                dashArray: '20.0,10.0',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 5.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+        }
+        map.createPane('pane_BlueLine_9');
+        map.getPane('pane_BlueLine_9').style.zIndex = 409;
+        map.getPane('pane_BlueLine_9').style['mix-blend-mode'] = 'normal';
+        var layer_BlueLine_9 = new L.geoJson(json_BlueLine_9, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_BlueLine_9',
+            layerName: 'layer_BlueLine_9',
+            pane: 'pane_BlueLine_9',
+            onEachFeature: pop_BlueLine_9,
+            style: style_BlueLine_9_0,
+        });
+        bounds_group.addLayer(layer_BlueLine_9);
+        map.addLayer(layer_BlueLine_9);
+        function pop_RedLine_10(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (var i in e.target._eventParents) {
+                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                            e.target._eventParents[i].resetStyle(e.target);
+                        }
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">Bus stop name</th>\
+                        <td class="visible-with-data" id="Name">' + (feature.properties['Name'] !== null ? autolinker.link(String(feature.properties['Name']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Length</th>\
+                        <td class="visible-with-data" id="Length">' + (feature.properties['Length'] !== null ? autolinker.link(String(feature.properties['Length']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_RedLine_10_0() {
+            return {
+                pane: 'pane_RedLine_10',
+                opacity: 1,
+                color: 'rgba(227,26,28,1.0)',
+                dashArray: '20.0,10.0',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 5.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+        }
+        map.createPane('pane_RedLine_10');
+        map.getPane('pane_RedLine_10').style.zIndex = 410;
+        map.getPane('pane_RedLine_10').style['mix-blend-mode'] = 'normal';
+        var layer_RedLine_10 = new L.geoJson(json_RedLine_10, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_RedLine_10',
+            layerName: 'layer_RedLine_10',
+            pane: 'pane_RedLine_10',
+            onEachFeature: pop_RedLine_10,
+            style: style_RedLine_10_0,
+        });
+        bounds_group.addLayer(layer_RedLine_10);
+        map.addLayer(layer_RedLine_10);
+        function pop_BlueLineStations_11(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (var i in e.target._eventParents) {
+                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                            e.target._eventParents[i].resetStyle(e.target);
+                        }
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row" style="padding-right: 10px;">Name of Bus Stop</th>\
+                        <td class="visible-with-data" id="Name">' + (feature.properties['Name'] !== null ? autolinker.link(String(feature.properties['Name']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Type</th>\
+                        <td class="visible-with-data" id="Classifica">' + (feature.properties['Classifica'] !== null ? autolinker.link(String(feature.properties['Classifica']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_BlueLineStations_11_0() {
+            return {
+                pane: 'pane_BlueLineStations_11',
+                shape: 'square',
+                radius: 7.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(0,0,255,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_BlueLineStations_11');
+        map.getPane('pane_BlueLineStations_11').style.zIndex = 411;
+        map.getPane('pane_BlueLineStations_11').style['mix-blend-mode'] = 'normal';
+        var layer_BlueLineStations_11 = new L.geoJson(json_BlueLineStations_11, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_BlueLineStations_11',
+            layerName: 'layer_BlueLineStations_11',
+            pane: 'pane_BlueLineStations_11',
+            onEachFeature: pop_BlueLineStations_11,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.shapeMarker(latlng, style_BlueLineStations_11_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_BlueLineStations_11);
+        map.addLayer(layer_BlueLineStations_11);
+        function pop_RedLineStations_12(feature, layer) {
+            layer.on({
+                mouseout: function(e) {
+                    for (var i in e.target._eventParents) {
+                        if (typeof e.target._eventParents[i].resetStyle === 'function') {
+                            e.target._eventParents[i].resetStyle(e.target);
+                        }
+                    }
+                },
+                mouseover: highlightFeature,
+            });
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row" style="padding-right: 15px;">Bus stop name</th>\
+                        <td class="visible-with-data" id="Name">' + (feature.properties['Name'] !== null ? autolinker.link(String(feature.properties['Name']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <th scope="row">Type</th>\
+                        <td class="visible-with-data" id="Classifica">' + (feature.properties['Classifica'] !== null ? autolinker.link(String(feature.properties['Classifica']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            var content = removeEmptyRowsFromPopupContent(popupContent, feature);
+			layer.on('popupopen', function(e) {
+				addClassToPopupIfMedia(content, e.popup);
+			});
+			layer.bindPopup(content, { maxHeight: 400 });
+        }
+
+        function style_RedLineStations_12_0() {
+            return {
+                pane: 'pane_RedLineStations_12',
+                shape: 'square',
+                radius: 7.0,
+                opacity: 1,
+                color: 'rgba(35,35,35,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(227,26,28,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_RedLineStations_12');
+        map.getPane('pane_RedLineStations_12').style.zIndex = 412;
+        map.getPane('pane_RedLineStations_12').style['mix-blend-mode'] = 'normal';
+        var layer_RedLineStations_12 = new L.geoJson(json_RedLineStations_12, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_RedLineStations_12',
+            layerName: 'layer_RedLineStations_12',
+            pane: 'pane_RedLineStations_12',
+            onEachFeature: pop_RedLineStations_12,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.shapeMarker(latlng, style_RedLineStations_12_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_RedLineStations_12);
+        map.addLayer(layer_RedLineStations_12);
+        const url = {"Nominatim OSM": "https://nominatim.openstreetmap.org/search?format=geojson&addressdetails=1&",
+        "France BAN": "https://api-adresse.data.gouv.fr/search/?"}
+        var photonControl = L.control.photon({
+            url: url["Nominatim OSM"],
+            feedbackLabel: '',
+            position: 'topleft',
+            includePosition: true,
+            initial: true,
+            // resultsHandler: myHandler,
+        }).addTo(map);
+        photonControl._container.childNodes[0].style.borderRadius="10px"
+        // Create a variable to store the geoJSON data
+        var x = null;
+        // Create a variable to store the marker
+        var marker = null;
+        // Add an event listener to the Photon control to create a marker from the returned geoJSON data
+        var z = null;
+        photonControl.on('selected', function(e) {
+            console.log(photonControl.search.resultsContainer);
+            if (x != null) {
+                map.removeLayer(obj3.marker);
+                map.removeLayer(x);
+            }
+            obj2.gcd = e.choice;
+            x = L.geoJSON(obj2.gcd).addTo(map);
+            var label = typeof obj2.gcd.properties.label === 'undefined' ? obj2.gcd.properties.display_name : obj2.gcd.properties.label;
+            obj3.marker = L.marker(x.getLayers()[0].getLatLng()).bindPopup(label).addTo(map);
+            map.setView(x.getLayers()[0].getLatLng(), 17);
+            z = typeof e.choice.properties.label === 'undefined'? e.choice.properties.display_name : e.choice.properties.label;
+            console.log(e);
+            e.target.input.value = z;
+        });
+        var search = document.getElementsByClassName("leaflet-photon leaflet-control")[0];
+        search.classList.add("leaflet-control-search")
+        search.style.display = "flex";
+        search.style.backgroundColor="rgba(255,255,255,0.5)" 
+
+        // Create the new button element
+        var button = document.createElement("div");
+        button.id = "gcd-button-control";
+        button.className = "gcd-gl-btn fa fa-search search-button";
+
+        // Insert the button at the beginning of the search control
+        search.insertBefore(button, search.firstChild);
+        last = search.lastChild;
+        last.style.display = "none";
+        button.addEventListener("click", function (e) {
+            if (last.style.display === "none") {
+                last.style.display = "block";
+            } else {
+                last.style.display = "none";
+            }
+        });
+        var overlaysTree = [
+            {label: '<img src="legend/RedLineStations_12.png" /> Red Line Stations', layer: layer_RedLineStations_12},
+            {label: '<img src="legend/BlueLineStations_11.png" /> Blue Line Stations', layer: layer_BlueLineStations_11},
+            {label: '<img src="legend/RedLine_10.png" /> Red Line', layer: layer_RedLine_10},
+            {label: '<img src="legend/BlueLine_9.png" /> Blue Line', layer: layer_BlueLine_9},
+        {label: '<b>All BRT Stops</b>', collapsed: true, selectAllCheckbox: true, children: [
+            {label: '<img src="legend/IkoroduTBSStops_8.png" /> Ikorodu - TBS Stops', layer: layer_IkoroduTBSStops_8},
+            {label: '<img src="legend/AbuleEgbaOshodiStops_7.png" /> Abule Egba - Oshodi Stops', layer: layer_AbuleEgbaOshodiStops_7},
+            {label: '<img src="legend/Okokomaiko_6.png" /> Okokomaiko', layer: layer_Okokomaiko_6},
+            {label: '<img src="legend/LBEStops_5.png" /> LBE Stops', layer: layer_LBEStops_5},
+            {label: '<img src="legend/LASUBusStop_4.png" /> LASU Bus Stop', layer: layer_LASUBusStop_4},
+            {label: '<img src="legend/BarracksBusstop_3.png" /> Barracks Bus stop', layer: layer_BarracksBusstop_3},]},
+            {label: "Google Road", layer: layer_GoogleRoad_2},
+            {label: "Google Hybrid", layer: layer_GoogleHybrid_1},
+            {label: "Google Satellite", layer: layer_GoogleSatellite_0, radioGroup: 'bm' },]
+        var lay = L.control.layers.tree(null, overlaysTree,{
+            //namedToggle: true,
+            //selectorBack: false,
+            //closedSymbol: '&#8862; &#x1f5c0;',
+            //openedSymbol: '&#8863; &#x1f5c1;',
+            //collapseAll: 'Collapse all',
+            //expandAll: 'Expand all',
+            collapsed: true,
+        });
+        lay.addTo(map);
+        setBounds();
+        </script>
+    </body>
+</html>
