@@ -12,6 +12,7 @@
         <link rel="stylesheet" href="css/qgis2web.css">
         <link rel="stylesheet" href="css/fontawesome-all.min.css">
         <link rel="stylesheet" href="css/leaflet.photon.css">
+		<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
         <style>
         html, body, #map {
             width: 100%;
@@ -155,7 +156,7 @@
                 },
                 mouseover: highlightFeature,
             });
-            var popupContent = '<table>\
+            var popupContent = '<div style="font-family:Montserrat, sans-serif;">' + '<table>\
                     <tr>\
                         <th scope="row" style="padding-right: 10px;">Bus stop Name</th>\
                         <td class="visible-with-data" id="Name">' + (feature.properties['Name'] !== null ? autolinker.link(String(feature.properties['Name']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
@@ -211,7 +212,7 @@
                 },
                 mouseover: highlightFeature,
             });
-            var popupContent = '<table>\
+            var popupContent = '<div style="font-family:Montserrat, sans-serif;">' + '<table>\
                     <tr>\
                         <th scope="row" style="padding-right: 10px;">Bus stop Name</th>\
                         <td class="visible-with-data" id="Name">' + (feature.properties['Name'] !== null ? autolinker.link(String(feature.properties['Name']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
@@ -267,7 +268,7 @@
                 },
                 mouseover: highlightFeature,
             });
-            var popupContent = '<table>\
+            var popupContent = '<div style="font-family:Montserrat, sans-serif;">' + '<table>\
                     <tr>\
                         <th scope="row">ID</th>\
                         <td class="visible-with-data" id="ID">' + (feature.properties['ID'] !== null ? autolinker.link(String(feature.properties['ID']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
@@ -347,7 +348,7 @@
                 },
                 mouseover: highlightFeature,
             });
-            var popupContent = '<table>\
+            var popupContent = '<div style="font-family:Montserrat, sans-serif;">' + '<table>\
                     <tr>\
                         <th scope="row" style="padding-right: 10px;">Bus stop name</th>\
                         <td class="visible-with-data" id="Name">' + (feature.properties['Name'] !== null ? autolinker.link(String(feature.properties['Name']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
@@ -403,7 +404,7 @@
                 },
                 mouseover: highlightFeature,
             });
-            var popupContent = '<table>\
+            var popupContent = '<div style="font-family:Montserrat, sans-serif;">' + '<table>\
                     <tr>\
                         <th scope="row" style="padding-right: 10px;">Bus stop name</th>\
                         <td class="visible-with-data" id="Names">' + (feature.properties['Names'] !== null ? autolinker.link(String(feature.properties['Names']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
@@ -459,7 +460,7 @@
                 },
                 mouseover: highlightFeature,
             });
-            var popupContent = '<table>\
+            var popupContent = '<div style="font-family:Montserrat, sans-serif;">' + '<table>\
                     <tr>\
                         <th scope="row" style="padding-right: 10px;">Bus stop name</th>\
                         <td class="visible-with-data" id="Name">' + (feature.properties['Name'] !== null ? autolinker.link(String(feature.properties['Name']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
@@ -515,7 +516,7 @@
                 },
                 mouseover: highlightFeature,
             });
-            var popupContent = '<table>\
+            var popupContent = '<div style="font-family:Montserrat, sans-serif;">' + '<table>\
                     <tr>\
                         <th scope="row" style="padding-right: 20px;">Bus stop name</th>\
                         <td class="visible-with-data" id="Name">' + (feature.properties['Name'] !== null ? autolinker.link(String(feature.properties['Name']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
@@ -570,7 +571,7 @@
                 },
                 mouseover: highlightFeature,
             });
-            var popupContent = '<table>\
+            var popupContent = '<div style="font-family:Montserrat, sans-serif;">' + '<table>\
                     <tr>\
                         <th scope="row">Bus stop name</th>\
                         <td class="visible-with-data" id="Name">' + (feature.properties['Name'] !== null ? autolinker.link(String(feature.properties['Name']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
@@ -625,7 +626,7 @@
                 },
                 mouseover: highlightFeature,
             });
-            var popupContent = '<table>\
+            var popupContent = '<div style="font-family:Montserrat, sans-serif;">' + '<table>\
                     <tr>\
                         <th scope="row" style="padding-right: 10px;">Name of Bus Stop</th>\
                         <td class="visible-with-data" id="Name">' + (feature.properties['Name'] !== null ? autolinker.link(String(feature.properties['Name']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
@@ -690,7 +691,7 @@
                 },
                 mouseover: highlightFeature,
             });
-            var popupContent = '<table>\
+            var popupContent = '<div style="font-family:Montserrat, sans-serif;">' + '<table>\
                     <tr>\
                         <th scope="row" style="padding-right: 15px;">Bus stop name</th>\
                         <td class="visible-with-data" id="Name">' + (feature.properties['Name'] !== null ? autolinker.link(String(feature.properties['Name']).replace(/'/g, '\'').toLocaleString()) : '') + '</td>\
